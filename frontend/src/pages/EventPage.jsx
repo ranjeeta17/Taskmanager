@@ -192,6 +192,7 @@ const EventPage = () => {
               onSuccess={handleFormSuccess}
               user={user}
             />
+          
           ) : (
             <EventList
               events={events}
