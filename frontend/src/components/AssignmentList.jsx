@@ -1,6 +1,5 @@
 // components/AssignmentList.jsx
 import React from 'react';
-import { toast } from 'react-toastify';
 import moment from 'moment';
 
 const AssignmentList = ({
@@ -24,9 +23,7 @@ const AssignmentList = ({
   const handleDeleteWithToast = async (id) => {
     try {
       await handleDelete(id);
-      toast.success('Assignment deleted successfully');
     } catch (error) {
-      toast.error('Failed to delete assignment');
     }
   };
 

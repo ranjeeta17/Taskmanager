@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
-import { toast } from 'react-toastify';
 
 const AssignmentForm = ({
   assignments,
@@ -75,7 +74,6 @@ const AssignmentForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
       return;
     }
 
@@ -95,13 +93,11 @@ const AssignmentForm = ({
         setAssignments((prev) =>
           prev.map((a) => (a._id === editingAssignment._id ? { ...a, ...response.data } : a))
         );
-        toast.success('Assignment updated successfully');
       } else {
         response = await axiosInstance.post('/api/assignments', submitData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setAssignments((prev) => [...prev, response.data]);
-        toast.success('Assignment created successfully');
       }
 
       setFormData({ title: '', description: '', courseId: '', dueAt: '', status: 'todo' });
@@ -111,7 +107,6 @@ const AssignmentForm = ({
     } catch (error) {
       console.error('Error submitting assignment:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Failed to save assignment';
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

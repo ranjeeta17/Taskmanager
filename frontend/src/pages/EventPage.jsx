@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import EventForm from '../components/EventForm';
 import EventList from '../components/EventList';
-import { toast } from 'react-toastify';
 
 
 const EventPage = () => {
@@ -58,10 +57,8 @@ const EventPage = () => {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setEvents((prev) => prev.filter((e) => e._id !== id));
-      toast.success('Event deleted successfully');
       fetchEvents();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to delete event');
       fetchEvents();
     }
   }, [user, fetchEvents]);
@@ -90,9 +87,7 @@ const EventPage = () => {
       setEvents((prev) =>
         prev.map((e) => (e._id === event._id ? { ...e, startAt: start, endAt: end } : e))
       );
-      toast.success('Event rescheduled successfully');
     } catch (error) {
-      toast.error('Failed to reschedule event');
       fetchEvents();
     }
   }, [user, fetchEvents]);

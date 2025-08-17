@@ -1,5 +1,4 @@
 import React from 'react';
-import { toast } from 'react-toastify';
 import moment from 'moment';
 
 const EventList = ({
@@ -27,9 +26,7 @@ const EventList = ({
   const handleDeleteWithToast = async (id) => {
     try {
       await handleDelete(id);
-      toast.success('Event deleted successfully');
     } catch (error) {
-      toast.error('Failed to delete event');
     }
   };
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../axiosConfig';
-import { toast } from 'react-toastify';
 
 const EventForm = ({ events, setEvents, editingEvent, setEditingEvent, setMode, onSuccess, user }) => {
   const [formData, setFormData] = useState({
@@ -93,7 +92,6 @@ const EventForm = ({ events, setEvents, editingEvent, setEditingEvent, setMode, 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
       return;
     }
 
@@ -114,13 +112,11 @@ const EventForm = ({ events, setEvents, editingEvent, setEditingEvent, setMode, 
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setEvents(events.map((e) => (e._id === editingEvent._id ? response.data : e)));
-        toast.success('Event updated successfully');
       } else {
         response = await axiosInstance.post('/api/events', submitData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setEvents([...events, response.data]);
-        toast.success('Event created successfully');
       }
 
       setFormData({
@@ -139,7 +135,6 @@ const EventForm = ({ events, setEvents, editingEvent, setEditingEvent, setMode, 
       if (onSuccess) onSuccess();
       else setMode('list');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to save event');
     } finally {
       setLoading(false);
     }
