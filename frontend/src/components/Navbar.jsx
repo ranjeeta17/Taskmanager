@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -13,24 +14,26 @@ const Navbar = () => {
   return (
     <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
       <Link to="/" className="text-2xl font-bold">Task Manager</Link>
-      <div>
+      <div className="flex items-center space-x-4">
         {user ? (
           <>
-            <Link to="/tasks" className="mr-4">Tasks</Link>
-            <Link to="/profile" className="mr-4">Profile</Link>
+            <Link to="/tasks" className="hover:underline">Tasks</Link>
+            <Link to="/events" className="hover:underline">Events</Link>
+            <Link to="/assignments" className="hover:underline">Assignments</Link>
+            <Link to="/profile" className="hover:underline">Profile</Link>
             <button
               onClick={handleLogout}
-              className="bg-red-500 px-4 py-2 rounded hover:bg-red-700"
+              className="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition-colors"
             >
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="mr-4">Login</Link>
+            <Link to="/login" className="hover:underline">Login</Link>
             <Link
               to="/register"
-              className="bg-green-500 px-4 py-2 rounded hover:bg-green-700"
+              className="bg-green-500 px-4 py-2 rounded hover:bg-green-600 transition-colors"
             >
               Register
             </Link>
