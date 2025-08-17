@@ -24,7 +24,14 @@ const EventList = ({
     setMode('edit');
   };
 
-
+  const handleDeleteWithToast = async (id) => {
+    try {
+      await handleDelete(id);
+      toast.success('Event deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete event');
+    }
+  };
 
   const getPriorityBadge = (priority) => {
     switch (priority) {
@@ -241,7 +248,13 @@ const EventList = ({
                         >
                           Edit
                         </button>
-                      
+                        <button
+                          onClick={() => handleDeleteWithToast(event._id)}
+                          className="text-red-600 hover:text-red-900 transition-colors"
+                          title="Delete event"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>

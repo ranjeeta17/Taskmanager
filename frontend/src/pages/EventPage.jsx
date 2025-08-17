@@ -192,7 +192,25 @@ const EventPage = () => {
               onSuccess={handleFormSuccess}
               user={user}
             />
-          
+          ) : mode === 'calendar' ? (
+            <div className="bg-white shadow-sm rounded-lg p-4">
+              <Calendar
+                localizer={localizer}
+                events={events.map((event) => ({
+                  ...event,
+                  start: new Date(event.startAt),
+                  end: new Date(event.endAt),
+                  title: event.title,
+                }))}
+                startAccessor="start"
+                endAccessor="end"
+                style={{ height: 600 }}
+                onSelectEvent={handleSelectEvent}
+                onEventDrop={handleEventDrop}
+                draggableAccessor={() => true}
+                eventPropGetter={eventStyleGetter}
+              />
+            </div>
           ) : (
             <EventList
               events={events}
