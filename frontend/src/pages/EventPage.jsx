@@ -4,11 +4,7 @@ import axiosInstance from '../axiosConfig';
 import EventForm from '../components/EventForm';
 import EventList from '../components/EventList';
 import { toast } from 'react-toastify';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-const localizer = momentLocalizer(moment);
 
 const EventPage = () => {
   const { user } = useAuth();
@@ -192,26 +188,7 @@ const EventPage = () => {
               onSuccess={handleFormSuccess}
               user={user}
             />
-          ) : mode === 'calendar' ? (
-            <div className="bg-white shadow-sm rounded-lg p-4">
-              <Calendar
-                localizer={localizer}
-                events={events.map((event) => ({
-                  ...event,
-                  start: new Date(event.startAt),
-                  end: new Date(event.endAt),
-                  title: event.title,
-                }))}
-                startAccessor="start"
-                endAccessor="end"
-                style={{ height: 600 }}
-                onSelectEvent={handleSelectEvent}
-                onEventDrop={handleEventDrop}
-                draggableAccessor={() => true}
-                eventPropGetter={eventStyleGetter}
-              />
-            </div>
-          ) : (
+          )  : (
             <EventList
               events={events}
               setEvents={setEvents}
