@@ -1,32 +1,24 @@
 const mongoose = require('mongoose');
 
-const assignmentSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, 'Assignment title is required'],
-    trim: true,
-    maxlength: [100, 'Title cannot exceed 100 characters']
+const assignmentSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    title: { type: String, required: true, trim: true, maxlength: 120 },
+    description: { type: String, trim: true, maxlength: 2000 },
+    courseId: { type: String, trim: true, maxlength: 50 },
+    dueAt: { type: Date },
+    status: {
+      type: String,
+      enum: ['todo', 'in-progress', 'submitted', 'graded'],
+      default: 'todo',
+      index: true,
+    },
+    // optional: same priority scale as tasks/events
+    priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
   },
-  courseId: {
-    type: String,
-    required: [true, 'Course ID is required']
-  },
-  dueAt: {
-    type: Date,
-    required: [true, 'Due date is required'],
-    validate: {
-      validator: function(value) {
-        return value > new Date();
-      },
-      message: 'Due date must be in the future'
-    }
-  },
-  status: {
-    type: String,
-    enum: ['todo', 'submitted', 'graded'],
-    default: 'todo'
-  },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
-}, { timestamps: true });
+  { timestamps: true }
+);
+
+assignmentSchema.index({ userId: 1, dueAt: 1 });
 
 module.exports = mongoose.model('Assignment', assignmentSchema);
