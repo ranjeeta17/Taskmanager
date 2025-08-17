@@ -1,5 +1,5 @@
+// components/EventList.jsx
 import React from 'react';
-import moment from 'moment';
 
 const EventList = ({
   events,
@@ -15,9 +15,7 @@ const EventList = ({
   user,
 }) => {
   const handleEdit = (event) => {
-    console.log("this is here ")
-    // Ensure IDs are strings to avoid mismatch
-    
+    console.log("this is here ");
     console.log('Editing event:', event);
     setEditingEvent(event);
     setMode('edit');
@@ -26,8 +24,7 @@ const EventList = ({
   const handleDeleteWithToast = async (id) => {
     try {
       await handleDelete(id);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const getPriorityBadge = (priority) => {
@@ -49,6 +46,28 @@ const EventList = ({
 
   const clearAllFilters = () => {
     setFilters({ from: '', to: '', type: '', courseId: '', priority: '' });
+  };
+
+  // ✅ Date formatting helpers
+  const formatDateTime = (dateString) => {
+    if (!dateString) return 'No date';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date(dateString));
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date(dateString));
   };
 
   return (
@@ -226,8 +245,8 @@ const EventList = ({
                       <div className="text-sm text-gray-900">{event.courseId}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{moment(event.startAt).format('MMM DD, YYYY h:mm A')}</div>
-                      <div className="text-xs text-gray-500">to {moment(event.endAt).format('h:mm A')}</div>
+                      <div className="text-sm text-gray-900">{formatDateTime(event.startAt)}</div>
+                      <div className="text-xs text-gray-500">to {formatTime(event.endAt)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span

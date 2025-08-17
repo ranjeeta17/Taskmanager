@@ -1,6 +1,5 @@
 // components/AssignmentList.jsx
 import React from 'react';
-import moment from 'moment';
 
 const AssignmentList = ({
   assignments,
@@ -79,6 +78,15 @@ const AssignmentList = ({
     if (diffDays === 1) return 'Due tomorrow';
     if (diffDays < 7) return `Due in ${diffDays} days`;
     return null;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return null;
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+    }).format(new Date(dateString));
   };
 
   return (
@@ -232,15 +240,8 @@ const AssignmentList = ({
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {assignment.dueAt
-                            ? moment(assignment.dueAt).format('MMM DD, YYYY')
-                            : 'No due date'}
+                          {assignment.dueAt ? formatDate(assignment.dueAt) : 'No due date'}
                         </div>
-                        {assignment.dueAt && (
-                          <div className="text-xs text-gray-500">
-                            {moment(assignment.dueAt).format('h:mm A')}
-                          </div>
-                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
@@ -254,7 +255,7 @@ const AssignmentList = ({
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3">
-                        <button
+                          <button
                             onClick={() => {
                               console.log('Edit button clicked for1:', assignment._id);
                               handleEdit(assignment);
