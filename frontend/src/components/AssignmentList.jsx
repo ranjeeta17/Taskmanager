@@ -5,15 +5,20 @@ import moment from 'moment';
 
 const AssignmentList = ({
   assignments,
-  
+  setAssignments,
+  setEditingAssignment,
   setMode,
-
   filters,
   setFilters,
   fetchAssignments,
   loading,
   user,
 }) => {
+
+  const handleEdit = (assignment) => {
+    setEditingAssignment(assignment);
+    setMode('edit');
+  };
 
   
   const getBadgeClass = (dueAt, status) => {
@@ -241,7 +246,21 @@ const AssignmentList = ({
                           {getStatusText(assignment.dueAt, assignment.status)}
                         </span>
                       </td>
-                      
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-3">
+                        <button
+                            onClick={() => {
+                              console.log('Edit button clicked for1:', assignment._id);
+                              handleEdit(assignment);
+                            }}
+                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            title="Edit assignment"
+                          >
+                            Edit
+                          </button>
+                          
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
