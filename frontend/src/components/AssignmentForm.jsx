@@ -1,8 +1,8 @@
 // components/AssignmentForm.jsx
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import axiosInstance from "../axiosConfig";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import axiosInstance from '../axiosConfig';
+import { toast } from 'react-toastify';
 
 const AssignmentForm = ({
   assignments,
@@ -14,11 +14,11 @@ const AssignmentForm = ({
 }) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    courseId: "",
-    dueAt: "",
-    status: "todo",
+    title: '',
+    description: '',
+    courseId: '',
+    dueAt: '',
+    status: 'todo',
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -27,21 +27,21 @@ const AssignmentForm = ({
   useEffect(() => {
     if (editingAssignment) {
       setFormData({
-        title: editingAssignment.title || "",
-        description: editingAssignment.description || "",
-        courseId: editingAssignment.courseId || "",
+        title: editingAssignment.title || '',
+        description: editingAssignment.description || '',
+        courseId: editingAssignment.courseId || '',
         dueAt: editingAssignment.dueAt
           ? new Date(editingAssignment.dueAt).toISOString().slice(0, 16)
-          : "",
-        status: editingAssignment.status || "todo",
+          : '',
+        status: editingAssignment.status || 'todo',
       });
     } else {
       setFormData({
-        title: "",
-        description: "",
-        courseId: "",
-        dueAt: "",
-        status: "todo",
+        title: '',
+        description: '',
+        courseId: '',
+        dueAt: '',
+        status: 'todo',
       });
     }
     setErrors({});
@@ -57,18 +57,17 @@ const AssignmentForm = ({
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: "",
+        [name]: '',
       }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.courseId.trim()) newErrors.courseId = "Course ID is required";
-    if (!formData.dueAt) newErrors.dueAt = "Due date is required";
-    else if (new Date(formData.dueAt) < new Date())
-      newErrors.dueAt = "Due date cannot be in the past";
+    if (!formData.title.trim()) newErrors.title = 'Title is required';
+    if (!formData.courseId.trim()) newErrors.courseId = 'Course ID is required';
+    if (!formData.dueAt) newErrors.dueAt = 'Due date is required';
+    else if (new Date(formData.dueAt) < new Date()) newErrors.dueAt = 'Due date cannot be in the past';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -76,7 +75,7 @@ const AssignmentForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast.error("Please fix the errors in the form");
+      toast.error('Please fix the errors in the form');
       return;
     }
 
@@ -90,43 +89,28 @@ const AssignmentForm = ({
 
       let response;
       if (editingAssignment) {
-        response = await axiosInstance.put(
-          `/api/assignments/${editingAssignment._id}`,
-          submitData,
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }
-        );
+        response = await axiosInstance.put(`/api/assignments/${editingAssignment._id}`, submitData, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
         setAssignments((prev) =>
-          prev.map((a) =>
-            a._id === editingAssignment._id ? { ...a, ...response.data } : a
-          )
+          prev.map((a) => (a._id === editingAssignment._id ? { ...a, ...response.data } : a))
         );
-        toast.success("Assignment updated successfully");
+        toast.success('Assignment updated successfully');
       } else {
-        response = await axiosInstance.post("/api/assignments", submitData, {
+        response = await axiosInstance.post('/api/assignments', submitData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setAssignments((prev) => [...prev, response.data]);
-        toast.success("Assignment created successfully");
+        toast.success('Assignment created successfully');
       }
 
-      setFormData({
-        title: "",
-        description: "",
-        courseId: "",
-        dueAt: "",
-        status: "todo",
-      });
+      setFormData({ title: '', description: '', courseId: '', dueAt: '', status: 'todo' });
       setEditingAssignment(null);
       if (onSuccess) onSuccess();
-      else setMode("list");
+      else setMode('list');
     } catch (error) {
-      console.error("Error submitting assignment:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to save assignment";
+      console.error('Error submitting assignment:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to save assignment';
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -134,31 +118,22 @@ const AssignmentForm = ({
   };
 
   const handleCancel = () => {
-    setFormData({
-      title: "",
-      description: "",
-      courseId: "",
-      dueAt: "",
-      status: "todo",
-    });
+    setFormData({ title: '', description: '', courseId: '', dueAt: '', status: 'todo' });
     setEditingAssignment(null);
     setErrors({});
-    setMode("list");
+    setMode('list');
   };
 
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-white shadow-sm rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-6">
-          {editingAssignment ? "Edit Assignment" : "Create New Assignment"}
+          {editingAssignment ? 'Edit Assignment' : 'Create New Assignment'}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
               Assignment Title *
             </label>
             <input
@@ -168,21 +143,16 @@ const AssignmentForm = ({
               value={formData.title}
               onChange={handleChange}
               className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.title ? "border-red-500" : "border-gray-300"
+                errors.title ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter assignment title"
               disabled={loading}
             />
-            {errors.title && (
-              <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-            )}
+            {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
           </div>
 
           <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
             <textarea
@@ -198,10 +168,7 @@ const AssignmentForm = ({
           </div>
 
           <div>
-            <label
-              htmlFor="courseId"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="courseId" className="block text-sm font-medium text-gray-700 mb-2">
               Course ID *
             </label>
             <input
@@ -211,21 +178,16 @@ const AssignmentForm = ({
               value={formData.courseId}
               onChange={handleChange}
               className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.courseId ? "border-red-500" : "border-gray-300"
+                errors.courseId ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="e.g., CS101, MATH201"
               disabled={loading}
             />
-            {errors.courseId && (
-              <p className="mt-1 text-sm text-red-600">{errors.courseId}</p>
-            )}
+            {errors.courseId && <p className="mt-1 text-sm text-red-600">{errors.courseId}</p>}
           </div>
 
           <div>
-            <label
-              htmlFor="dueAt"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="dueAt" className="block text-sm font-medium text-gray-700 mb-2">
               Due Date & Time *
             </label>
             <input
@@ -235,20 +197,15 @@ const AssignmentForm = ({
               value={formData.dueAt}
               onChange={handleChange}
               className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.dueAt ? "border-red-500" : "border-gray-300"
+                errors.dueAt ? 'border-red-500' : 'border-gray-300'
               }`}
               disabled={loading}
             />
-            {errors.dueAt && (
-              <p className="mt-1 text-sm text-red-600">{errors.dueAt}</p>
-            )}
+            {errors.dueAt && <p className="mt-1 text-sm text-red-600">{errors.dueAt}</p>}
           </div>
 
           <div>
-            <label
-              htmlFor="status"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
               Status
             </label>
             <select
@@ -274,11 +231,11 @@ const AssignmentForm = ({
             >
               {loading
                 ? editingAssignment
-                  ? "Updating..."
-                  : "Creating..."
+                  ? 'Updating...'
+                  : 'Creating...'
                 : editingAssignment
-                ? "Update Assignment"
-                : "Create Assignment"}
+                ? 'Update Assignment'
+                : 'Create Assignment'}
             </button>
 
             <button
