@@ -20,7 +20,6 @@ const AssignmentPage = () => {
 
     setLoading(true);
     try {
-      // Clean filters - remove empty strings
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== '')
       );
@@ -33,7 +32,6 @@ const AssignmentPage = () => {
         params: cleanFilters,
       });
 
-      // Handle different response formats
       let assignmentsData = response.data;
       if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
         if (response.data.assignments) assignmentsData = response.data.assignments;
@@ -57,14 +55,12 @@ const AssignmentPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [user?.token, filters]); // ← memoized
+  }, [user?.token, filters]);
 
-  // Initial + user change
   useEffect(() => {
     fetchAssignments();
-  }, [fetchAssignments]); // ← no missing-deps warning
+  }, [fetchAssignments]);
 
-  // Refetch when returning to list mode
   useEffect(() => {
     if (mode === 'list') {
       fetchAssignments();
@@ -77,7 +73,6 @@ const AssignmentPage = () => {
       await axiosInstance.delete(`/api/assignments/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
-      // Optimistic update
       setAssignments((prev) => prev.filter((a) => a._id !== id));
     } catch (error) {
       console.error('❌ Failed to delete assignment:', error);
@@ -135,6 +130,7 @@ const AssignmentPage = () => {
           editingAssignment={editingAssignment}
           setEditingAssignment={setEditingAssignment}
           setMode={setMode}
+          fetchAssignments={fetchAssignments}
           onSuccess={handleFormSuccess}
         />
       ) : (
