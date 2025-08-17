@@ -8,6 +8,7 @@ const AssignmentList = ({
   setAssignments,
   setEditingAssignment,
   setMode,
+  handleDelete,
   filters,
   setFilters,
   fetchAssignments,
@@ -20,7 +21,15 @@ const AssignmentList = ({
     setMode('edit');
   };
 
-  
+  const handleDeleteWithToast = async (id) => {
+    try {
+      await handleDelete(id);
+      toast.success('Assignment deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete assignment');
+    }
+  };
+
   const getBadgeClass = (dueAt, status) => {
     if (status === 'submitted' || status === 'graded') return 'bg-green-100 text-green-800';
     if (!dueAt) return 'bg-gray-100 text-gray-800';
@@ -258,7 +267,13 @@ const AssignmentList = ({
                           >
                             Edit
                           </button>
-                          
+                          <button
+                            onClick={() => handleDeleteWithToast(assignment._id)}
+                            className="text-red-600 hover:text-red-900 transition-colors"
+                            title="Delete assignment"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
