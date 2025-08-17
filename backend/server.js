@@ -1,25 +1,38 @@
+// server.js
 const express = require('express');
-   const dotenv = require('dotenv');
-   const cors = require('cors');
-   const connectDB = require('./config/db');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const connectDB = require('./config/db');
 
-   dotenv.config();
+dotenv.config();
 
-   const app = express();
+const app = express();
 
-   app.use(cors());
-   app.use(express.json());
-   app.use('/api/auth', require('./routes/authRoutes'));
-   app.use('/api/tasks', require('./routes/taskRoutes'));
-   //app.use('/api/events', require('./routes/eventRoutes'));
-   app.use('/api/assignments', require('./routes/assignmentRoutes'));
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-   // Export the app object for testing
-   if (require.main === module) {
-       connectDB();
-       // If the file is run directly, start the server
-       const PORT = process.env.PORT || 5001;
-       app.listen(PORT, () => console.log("Server running on port ${PORT}"));
-   }
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/events', require('./routes/EventRoutes'));
+app.use('/api/assignments', require('./routes/assignmentRoutes'));
 
-   module.exports = app;
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Server error' });
+});
+
+// Start server
+if (require.main === module) {
+  connectDB().then(() => {
+    const PORT = process.env.PORT || 5001;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  }).catch((error) => {
+    console.error('Failed to connect to database:', error);
+    process.exit(1);
+  });
+}
+
+module.exports = app;
