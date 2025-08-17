@@ -322,7 +322,7 @@ describe('Event Controller', () => {
 });
 
 /* --------------------------------------------------------------------------------
-   ASSIGNMENT CONTROLLER TESTS
+   ASSIGNMEnpm NT CONTROLLER TESTS
    (controller uses req.user.id (string), checks assignment.userId.toString())
 -------------------------------------------------------------------------------- */
 describe('Assignment Controller', () => {
