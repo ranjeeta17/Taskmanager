@@ -24,7 +24,7 @@ const EventPage = () => {
 
     try {
       const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([_, value]) => value !== '')
+        Object.entries(filters).filter(([, value]) => value !== '')
       );
 
       const response = await axiosInstance.get('/api/events', {

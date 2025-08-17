@@ -21,7 +21,7 @@ const AssignmentPage = () => {
     setLoading(true);
     try {
       const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([_, value]) => value !== '')
+        Object.entries(filters).filter(([, value]) => value !== '')
       );
 
       const response = await axiosInstance.get('/api/assignments', {
@@ -42,25 +42,22 @@ const AssignmentPage = () => {
       setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
     } catch (error) {
       console.error('❌ Failed to fetch assignments:', error);
-      if (error.response?.status === 401) {
-        alert('Authentication failed. Please login again.');
-      } else if (error.response?.status === 404) {
-        alert('API endpoint not found. Check your server.');
-      } else if (error.response?.status >= 500) {
-        alert('Server error. Please try again later.');
-      } else {
-        alert(`Failed to fetch assignments: ${error.response?.data?.message || error.message}`);
-      }
+      if (error.response?.status === 401) alert('Authentication failed. Please login again.');
+      else if (error.response?.status === 404) alert('API endpoint not found. Check your server.');
+      else if (error.response?.status >= 500) alert('Server error. Please try again later.');
+      else alert(`Failed to fetch assignments: ${error.response?.data?.message || error.message}`);
       setAssignments([]);
     } finally {
       setLoading(false);
     }
   }, [user?.token, filters]);
 
+  // Initial load + whenever token/filters change (via the memoized fn)
   useEffect(() => {
     fetchAssignments();
   }, [fetchAssignments]);
 
+  // Refetch when returning to list view
   useEffect(() => {
     if (mode === 'list') {
       fetchAssignments();
