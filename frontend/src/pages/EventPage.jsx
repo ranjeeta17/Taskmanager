@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import EventForm from '../components/EventForm';
+import EventList from '../components/EventList';
 import { toast } from 'react-toastify';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -178,7 +179,9 @@ const EventPage = () => {
         </div>
       )}
 
-      
+      {!loading && !error && (
+        <>
+          {(mode === 'add' || mode === 'edit') ? (
             <EventForm
               events={events}
               setEvents={setEvents}
@@ -189,12 +192,22 @@ const EventPage = () => {
               onSuccess={handleFormSuccess}
               user={user}
             />
-         
-          
-            
-          
-        
-      
+          ) : (
+            <EventList
+              events={events}
+              setEvents={setEvents}
+              setEditingEvent={setEditingEvent}
+              setMode={setMode}
+              handleDelete={handleDelete}
+              filters={filters}
+              setFilters={setFilters}
+              fetchEvents={fetchEvents}
+              loading={loading}
+              user={user}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 };
