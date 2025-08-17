@@ -5,7 +5,6 @@ on:
     branches:
       - main  # Trigger CI on pushes to the main branch
 
-
 jobs:
   test:
     name: Run Tests
@@ -13,10 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22] # Test on multiple Node.js versions
-
-
-    environment: MONGO_URI
+        node-version: [22]
 
     steps:
     - name: Checkout Code
@@ -28,8 +24,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    # Debug secrets (remove in production)
     - name: Print Env Secret
-
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -38,17 +34,19 @@ jobs:
         echo "Secret 1 is: $MONGO_URI"
         echo "Secret 2 is: $JWT_SECRET"
         echo "Secret 3 is: $PORT"
-      
-    - run: pm2 stop all
+
+    # Stop existing PM2 processes (don't fail if none exist)
+    - name: Stop PM2 processes
+      run: pm2 stop all || true
 
     # Install dependencies for backend
     - name: Install Backend Dependencies
       working-directory: ./backend
       run: | 
-       npm install --global yarn
-       yarn --version
-       yarn install
-      
+        npm install --global yarn
+        yarn --version
+        yarn install
+
     # Install dependencies for frontend
     - name: Install Frontend Dependencies
       working-directory: ./frontend
@@ -57,7 +55,6 @@ jobs:
         sudo rm -rf ./build
         yarn install
         yarn run build
-
 
     # Run backend tests
     - name: Run Backend Tests
@@ -68,13 +65,19 @@ jobs:
       working-directory: ./backend
       run: npm test
 
-
-    - run: npm ci
-    - run: | 
-        cd ./backend
+    # Prepare production .env file
+    - name: Create .env file
+      working-directory: ./backend
+      run: |
         touch .env
         echo "${{ secrets.PROD }}" > .env
 
-    - run: pm2 start all
+    # Start backend with PM2 (fresh run if not exists)
+    - name: Start Backend with PM2
+      working-directory: ./backend
+      run: |
+        pm2 start npm --name backend -- start || pm2 restart backend
 
-    - run: pm2 restart all
+    # Save PM2 process list (so it persists across restarts)
+    - name: Save PM2 Process List
+      run: pm2 save
