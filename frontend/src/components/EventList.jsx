@@ -15,9 +15,17 @@ const EventList = ({
   loading,
   user,
 }) => {
-  
+  const handleEdit = (event) => {
+    console.log("this is here ")
+    // Ensure IDs are strings to avoid mismatch
+    
+    console.log('Editing event:', event);
+    setEditingEvent(event);
+    setMode('edit');
+  };
 
-  
+
+
   const getPriorityBadge = (priority) => {
     switch (priority) {
       case 'high':
@@ -224,7 +232,18 @@ const EventList = ({
                         {event.priority.charAt(0).toUpperCase() + event.priority.slice(1)}
                       </span>
                     </td>
-                    
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={() => handleEdit(event)}
+                          className="text-blue-600 hover:text-blue-900 transition-colors"
+                          title="Edit event"
+                        >
+                          Edit
+                        </button>
+                      
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
