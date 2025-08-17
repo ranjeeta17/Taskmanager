@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import AssignmentForm from '../components/AssignmentForm';
@@ -12,8 +12,7 @@ const AssignmentPage = () => {
   const [filters, setFilters] = useState({ status: '', courseId: '', due: '' });
   const [loading, setLoading] = useState(false);
 
-  // Fetch assignments function
-  const fetchAssignments = async () => {
+  const fetchAssignments = useCallback(async () => {
     if (!user?.token) {
       console.log('No user token available');
       return;
@@ -21,49 +20,30 @@ const AssignmentPage = () => {
 
     setLoading(true);
     try {
-      console.log('🔍 Fetching assignments...');
-      console.log('User token present:', !!user.token);
-      console.log('Current filters:', filters);
-      
       // Clean filters - remove empty strings
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== '')
       );
-      
-      console.log('Clean filters being sent:', cleanFilters);
 
       const response = await axiosInstance.get('/api/assignments', {
-        headers: { 
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
         },
-        params: cleanFilters
+        params: cleanFilters,
       });
-      
-      console.log('✅ API Response received:', response);
-      console.log('Response status:', response.status);
-      console.log('Response data:', response.data);
-      console.log('Number of assignments:', response.data?.length || 0);
-      
+
       // Handle different response formats
       let assignmentsData = response.data;
-      
       if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
         if (response.data.assignments) assignmentsData = response.data.assignments;
         else if (response.data.data) assignmentsData = response.data.data;
         else if (response.data.results) assignmentsData = response.data.results;
       }
-      
-      console.log('Final assignments data:', assignmentsData);
+
       setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
-      
     } catch (error) {
       console.error('❌ Failed to fetch assignments:', error);
-      console.error('Error status:', error.response?.status);
-      console.error('Error data:', error.response?.data);
-      console.error('Error message:', error.message);
-      
-      // More specific error messages
       if (error.response?.status === 401) {
         alert('Authentication failed. Please login again.');
       } else if (error.response?.status === 404) {
@@ -73,57 +53,39 @@ const AssignmentPage = () => {
       } else {
         alert(`Failed to fetch assignments: ${error.response?.data?.message || error.message}`);
       }
-      
       setAssignments([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.token, filters]); // ← memoized
 
-  // Initial fetch when component mounts
+  // Initial + user change
   useEffect(() => {
-    console.log('Component mounted, user:', user);
     fetchAssignments();
-  }, [user]);
-
-  // Fetch when filters change
-  useEffect(() => {
-    if (user?.token) {
-      console.log('Filters changed, refetching...');
-      fetchAssignments();
-    }
-  }, [filters]);
+  }, [fetchAssignments]); // ← no missing-deps warning
 
   // Refetch when returning to list mode
   useEffect(() => {
-    if (mode === 'list' && user?.token) {
-      console.log('Switched to list mode, refetching assignments...');
+    if (mode === 'list') {
       fetchAssignments();
     }
-  }, [mode]);
+  }, [mode, fetchAssignments]);
 
-  // Handle deleting an assignment
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this assignment?')) return;
-
     try {
       await axiosInstance.delete(`/api/assignments/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
+        headers: { Authorization: `Bearer ${user?.token}` },
       });
-      
-      // Remove from local state immediately for better UX
-      setAssignments(assignments.filter((a) => a._id !== id));
-      console.log('✅ Assignment deleted successfully');
-      
+      // Optimistic update
+      setAssignments((prev) => prev.filter((a) => a._id !== id));
     } catch (error) {
       console.error('❌ Failed to delete assignment:', error);
       alert(`Failed to delete assignment: ${error.response?.data?.message || error.message}`);
     }
   };
 
-  // Handle successful form submission
   const handleFormSuccess = () => {
-    console.log('Form submitted successfully, refetching data...');
     fetchAssignments();
     setMode('list');
   };
@@ -140,7 +102,7 @@ const AssignmentPage = () => {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Assignments</h1>
-        {mode === 'list' && (
+        {mode === 'list' ? (
           <button
             onClick={() => {
               setEditingAssignment(null);
@@ -150,8 +112,7 @@ const AssignmentPage = () => {
           >
             Add Assignment
           </button>
-        )}
-        {mode !== 'list' && (
+        ) : (
           <button
             onClick={() => setMode('list')}
             className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
